@@ -1,5 +1,3 @@
-def IMAGE_TAG
-
 pipeline {
     agent any
     tools {
@@ -28,7 +26,7 @@ pipeline {
                     def MINOR_VERSION = sh([script: 'git tag | sort --version-sort | tail -1 | cut -d . -f 2', returnStdout: true]).trim()
                     def PATCH_VERSION = sh([script: 'git tag | sort --version-sort | tail -1 | cut -d . -f 3', returnStdout: true]).trim()
                     def NEW_MINOR_VERSION = MINOR_VERSION.toInteger() + 1
-                    IMAGE_TAG = "$MAJOR_VERSION.$NEW_MINOR_VERSION.$PATCH_VERSION"
+                    env.IMAGE_TAG = "$MAJOR_VERSION.$NEW_MINOR_VERSION.$PATCH_VERSION"
                 }
                 sh "docker build -t $DOCKER_PASSWORD_USR/$DOCKER_IMAGE:$IMAGE_TAG ."
             }
@@ -39,7 +37,7 @@ pipeline {
                 sh('echo "$DOCKER_PASSWORD_PSW" | docker login -u $DOCKER_PASSWORD_USR --password-stdin')
                 sh "docker push $DOCKER_PASSWORD_USR/$DOCKER_IMAGE:$IMAGE_TAG"
                 sh "git tag ${env.IMAGE_TAG}"
-                sh "git push https://$GITHUB_TOKEN@github.com/${GITHUB_REPO} ${IMAGE_TAG}"
+                sh('git push https://$GITHUB_TOKEN@github.com/GITHUB_REPO IMAGE_TAG')
             }
         }
     }
