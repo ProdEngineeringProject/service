@@ -1,11 +1,20 @@
 package ro.unibuc.hello.controller;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,15 +26,16 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ro.unibuc.hello.data.ItemEntity;
-import ro.unibuc.hello.data.SessionEntity;
-import ro.unibuc.hello.data.UserEntity;
 import ro.unibuc.hello.data.ItemRepository;
+import ro.unibuc.hello.data.SessionEntity;
 import ro.unibuc.hello.data.SessionRepository;
+import ro.unibuc.hello.data.UserEntity;
 import ro.unibuc.hello.data.UserRepository;
-import ro.unibuc.hello.service.ItemsService;
 import ro.unibuc.hello.dto.ItemPostRequest;
-import java.util.Optional;
+import ro.unibuc.hello.service.ItemsService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,7 +60,7 @@ public class ItemsControllerIntegrationTest {
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        final String MONGO_URL = "mongodb://localhost:";
+        final String MONGO_URL = "mongodb://host.docker.internal:";
         final String PORT = String.valueOf(mongoDBContainer.getMappedPort(27017));
 
         registry.add("mongodb.connection.url", () -> MONGO_URL + PORT);

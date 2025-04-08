@@ -1,27 +1,29 @@
 package ro.unibuc.hello.e2e.steps;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.spring.CucumberContextConfiguration;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.spring.CucumberContextConfiguration;
 import ro.unibuc.hello.dto.Greeting;
 import ro.unibuc.hello.e2e.util.HeaderSetup;
 import ro.unibuc.hello.e2e.util.ResponseErrorHandler;
 import ro.unibuc.hello.e2e.util.ResponseResults;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 @CucumberContextConfiguration
 @SpringBootTest()
@@ -34,7 +36,7 @@ public class HelloWorldSteps {
 
     @Given("^the client calls /hello-world")
     public void the_client_issues_GET_hello() {
-        executeGet("http://localhost:8080/hello-world");
+        executeGet("http://host.docker.internal:8080/hello-world");
     }
 
     @Then("^the client receives status code of (\\d+)$")
