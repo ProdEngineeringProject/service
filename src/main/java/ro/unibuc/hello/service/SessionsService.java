@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import ro.unibuc.hello.data.SessionEntity;
 import ro.unibuc.hello.data.SessionRepository;
 import ro.unibuc.hello.data.UserEntity;
@@ -24,6 +25,16 @@ public class SessionsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MeterRegistry metricsRegistry;
+
+    public SessionsService(SessionRepository sessionRepository, UserRepository userRepository, MeterRegistry metricsRegistry) {
+        this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
+        this.metricsRegistry = metricsRegistry;
+        this.metricsRegistry.gauge("active_sessions", sessionRepository, s -> s.count());
+    }
 
     public Session login(LoginRequest loginReq) {
         UserEntity user = userRepository.findByUsername(loginReq.getUsername())

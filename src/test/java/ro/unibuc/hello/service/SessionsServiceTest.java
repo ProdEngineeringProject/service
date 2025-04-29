@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import ro.unibuc.hello.data.SessionEntity;
 import ro.unibuc.hello.data.SessionRepository;
 import ro.unibuc.hello.data.UserEntity;
@@ -35,12 +37,17 @@ class SessionsServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MeterRegistry metricsRegistry;
+
     @InjectMocks
-    private SessionsService sessionsService = new SessionsService();
+    private SessionsService sessionsService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(sessionRepository.count()).thenReturn(42L);
+        when(metricsRegistry.gauge(eq("active_sessions"), eq(sessionRepository), any())).thenReturn(sessionRepository);
     }
 
     @Test
