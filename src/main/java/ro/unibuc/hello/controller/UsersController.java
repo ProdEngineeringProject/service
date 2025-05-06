@@ -24,6 +24,7 @@ import ro.unibuc.hello.permissions.UserPermissionChecker;
 import ro.unibuc.hello.service.UsersService;
 
 
+
 @Controller
 public class UsersController {
 
@@ -90,4 +91,10 @@ public class UsersController {
         permissionChecker.checkOwnership(userId, id);
         userService.deleteUser(id);
     }
+
+    @PublicEndpoint
+    @GetMapping("/users/trigger-exception")
+    public String getMethodName() {
+        throw new RuntimeException("Inject error");
+    }   
 }

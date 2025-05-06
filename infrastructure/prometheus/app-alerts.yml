@@ -18,3 +18,20 @@ groups:
         annotations:
           summary: Increased info retrieval rate {{ $labels.value}} {{ $value }}
           description: "A container has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: WARNING-HighErrorRate
+        expr: rate(auctions_general_exception_count_total[1m]) > 10
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: Increased application error rate
+
+      - alert: CRITICAL-HighErrorRate
+        expr: rate(auctions_general_exception_count_total[1m]) > 40
+        for: 10s
+        labels:
+          severity: error
+        annotations:
+          summary: Increased application error rate
+    
