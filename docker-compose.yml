@@ -10,10 +10,15 @@ services:
       ENVIRONMENT_NAME: local
       MONGODB_CONECTION_URL: mongodb://root:example@mongo:27017/
     restart: always
+    depends_on:
+      - loki
     logging:
       driver: loki
       options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        mode: "non-blocking"
+    # depends_on:
+    #   - loki
     profiles:
       - "hello-service"
   jenkins:
@@ -39,10 +44,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    depends_on:
+      - loki
     logging:
       driver: loki
       options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     profiles:
       - "mongo"
   mongo-admin-ui:
@@ -56,10 +63,13 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH_USERNAME: unibuc
       ME_CONFIG_BASICAUTH_PASSWORD: adobe
+    depends_on:
+      - loki
     logging:
       driver: loki
       options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        mode: "non-blocking"
     profiles:
       - "mongo"
 # MONITORING SERVICES
@@ -94,6 +104,8 @@ services:
     command: -config.file=/etc/loki/config.yaml
     profiles:
       - "monitoring"
+      - "hello-service"
+      - "mongo"
   prometheus: # metrics aggregation and alert definition server (prometheus server)
     image: prom/prometheus:v3.1.0
     volumes:
@@ -103,10 +115,6 @@ services:
       - "--storage.tsdb.path=/etc/prometheus/durable"
     ports:
       - 9090:9090
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
     profiles:
       - "monitoring"
   alertmanager: # alert manager (prometheus)
@@ -116,10 +124,6 @@ services:
     command: --config.file=/config/alertmanager.yml --log.level=debug
     ports:
       - "9093:9093"
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
     profiles:
       - "monitoring"
   grafana: # dashboard visualisation tool (metrics & logs)
@@ -140,17 +144,9 @@ services:
     profiles:
       - "perf"
     command: wrk -t4 -c10 -d300s http://hello:8080/hello-world
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
     
   wrk-injector-info-perf: # traffic injector (high)
     image: mtchavez/docker-wrk
     profiles:
       - "perf"
     command: wrk -t4 -c1000 -d5m --timeout 1s --latency http://hello:8080/info
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
