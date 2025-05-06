@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import ro.unibuc.hello.auth.PublicEndpoint;
 import ro.unibuc.hello.dto.LoginRequest;
@@ -25,12 +26,14 @@ public class SessionsController {
     @PublicEndpoint
     @PostMapping("/login")
     @Timed(value = "auctions.sessions.login.time", description = "Time taken to login")
+    @Counted(value = "auctions.sessions.login.count", description = "Times login handled")
     public Session login(@RequestBody LoginRequest loginReq) {
         return sessionService.login(loginReq);
     }
 
     @PostMapping("/logout")
     @Timed(value = "auctions.sessions.logout.time", description = "Time taken to logout")
+    @Counted(value = "auctions.sessions.logout.count", description = "Times logout handled")
     public ResponseEntity<String> logout(@RequestHeader("X-Session-Id") String sessionId) {
         boolean success = sessionService.logout(sessionId);
 
