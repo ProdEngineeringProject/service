@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import io.micrometer.core.annotation.Timed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ro.unibuc.hello.data.SessionEntity;
@@ -19,6 +20,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private SessionsService sessionService;
 
     @Override
+    @Timed(value = "auctions.sessions.verify_session.time", description = "Time taken to verify session")
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
         // Allow static resources and other handlers
         if (!(handler instanceof HandlerMethod)) {

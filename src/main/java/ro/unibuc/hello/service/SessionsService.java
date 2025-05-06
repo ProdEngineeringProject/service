@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import ro.unibuc.hello.data.SessionEntity;
 import ro.unibuc.hello.data.SessionRepository;
@@ -33,7 +34,9 @@ public class SessionsService {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.metricsRegistry = metricsRegistry;
-        this.metricsRegistry.gauge("active_sessions", sessionRepository, s -> s.count());
+        Gauge.builder("auctions.sessions.active.count", sessionRepository, s -> s.count())
+            .description("Number of currently active sessions")
+            .register(this.metricsRegistry);
     }
 
     public Session login(LoginRequest loginReq) {
